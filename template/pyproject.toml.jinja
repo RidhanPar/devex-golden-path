@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{ project_slug }}"
+version = "0.1.0"
+description = "{{ description }}"
+requires-python = ">={{ python_version }}"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --cov={{ package_name }} --cov-report=term-missing --cov-fail-under={{ coverage_threshold }}"
+
+[tool.coverage.run]
+branch = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_version | replace('.', '') }}"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# E/F/W: pycodestyle + pyflakes, I: isort, B: bugbear, UP: pyupgrade,
+# S: bandit-style security checks, SIM: simplifications.
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # assert is how pytest works
+
+[tool.mypy]
+python_version = "{{ python_version }}"
+strict = true
+mypy_path = "src"
+files = ["src", "tests"]

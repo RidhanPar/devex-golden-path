@@ -1,0 +1,46 @@
+# {{ project_name }}
+
+{{ description }}
+
+Generated from the [DevEx golden path](https://github.com/{{ github_org }}/devex-golden-path).
+Owner: **{{ owner_team }}**.
+
+## Quickstart
+
+Prerequisites: Python {{ python_version }}+ and git. Docker is optional (for `docker-build`).
+Or open the folder in VS Code and choose **Reopen in Container**.
+
+```bash
+# Linux / macOS
+make setup
+make check
+make run        # http://127.0.0.1:8000/docs
+```
+
+```powershell
+# Windows (PowerShell)
+./dev.ps1 setup
+./dev.ps1 check
+./dev.ps1 run   # http://127.0.0.1:8000/docs
+```
+
+Run `make help` or `./dev.ps1 help` to list all commands.
+
+## Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/health` | Liveness probe: `{"status": "ok", "version": "..."}` |
+| GET | `/hello?name=Ada` | Greeting |
+
+## Working with AI tools
+
+Read [`AI_USAGE.md`](AI_USAGE.md). Claude Code picks up [`CLAUDE.md`](CLAUDE.md) and the
+`.claude/` folder automatically: secrets are unreadable, ruff runs after every edit, and
+`/review` and `/write-tests` are available as commands.
+
+## Updating from the golden path
+
+```bash
+copier update --trust
+```

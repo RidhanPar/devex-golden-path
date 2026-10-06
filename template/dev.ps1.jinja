@@ -1,0 +1,95 @@
+<#
+.SYNOPSIS
+    Developer commands for Windows (PowerShell 5.1+) and PowerShell 7 on any OS.
+    Mirrors the Makefile one-to-one: same command names, same behaviour.
+
+.EXAMPLE
+    ./dev.ps1 setup
+    ./dev.ps1 check
+#>
+[CmdletBinding()]
+param(
+    [Parameter(Position = 0)]
+    [ValidateSet('help', 'setup', 'lint', 'format', 'typecheck', 'test', 'check', 'run', 'docker-build', 'clean')]
+    [string]$Command = 'help'
+)
+
+$ErrorActionPreference = 'Stop'
+Set-Location -Path $PSScriptRoot
+
+# PowerShell 5.1 only runs on Windows and does not define $IsWindows.
+$OnWindows = ($PSVersionTable.PSEdition -eq 'Desktop') -or $IsWindows
+$Venv = '.venv'
+$Bin = if ($OnWindows) { Join-Path $Venv 'Scripts' } else { Join-Path $Venv 'bin' }
+$Python = if ($env:PYTHON) { $env:PYTHON } elseif ($OnWindows) { 'python' } else { 'python3' }
+
+function Invoke-Tool {
+    # Run a tool from the virtualenv and stop on a non-zero exit code,
+    # so `check` fails exactly like `make check` does.
+    param([string]$Tool, [string[]]$Arguments = @())
+    $exe = Join-Path $Bin $Tool
+    & $exe @Arguments
+    if ($LASTEXITCODE -ne 0) { throw "$Tool $($Arguments -join ' ') failed with exit code $LASTEXITCODE" }
+}
+
+$Commands = [ordered]@{
+    'help'         = 'Show available commands'
+    'setup'        = 'Create .venv, install dependencies and git hooks'
+    'lint'         = 'Ruff lint + format check (no changes)'
+    'format'       = 'Auto-fix lint issues and format code'
+    'typecheck'    = 'mypy in strict mode'
+    'test'         = 'pytest with coverage threshold'
+    'check'        = 'Everything CI runs on code (lint, typecheck, test)'
+    'run'          = 'Run the service with auto-reload on http://127.0.0.1:8000'
+    'docker-build' = 'Build the container image'
+    'clean'        = 'Remove virtualenv and caches'
+}
+
+function Invoke-Lint {
+    Invoke-Tool 'ruff' @('check', '.')
+    Invoke-Tool 'ruff' @('format', '--check', '.')
+}
+function Invoke-Typecheck { Invoke-Tool 'mypy' }
+function Invoke-Test { Invoke-Tool 'pytest' }
+
+try {
+    switch ($Command) {
+        'help' {
+            foreach ($name in $Commands.Keys) { '  {0,-14} {1}' -f $name, $Commands[$name] }
+        }
+        'setup' {
+            & $Python -m venv $Venv
+            if ($LASTEXITCODE -ne 0) { throw "Could not create virtualenv with '$Python'. Set `$env:PYTHON to your Python 3 executable." }
+            Invoke-Tool 'python' @('-m', 'pip', 'install', '--quiet', '--upgrade', 'pip')
+            Invoke-Tool 'python' @('-m', 'pip', 'install', '--quiet', '-r', 'requirements-dev.txt', '-e', '.')
+            if (Test-Path '.git') { Invoke-Tool 'pre-commit' @('install') }
+            else { Write-Host "Not a git repo yet: run 'git init' then './dev.ps1 setup' to install hooks" }
+        }
+        'lint' { Invoke-Lint }
+        'format' {
+            Invoke-Tool 'ruff' @('check', '--fix', '.')
+            Invoke-Tool 'ruff' @('format', '.')
+        }
+        'typecheck' { Invoke-Typecheck }
+        'test' { Invoke-Test }
+        'check' {
+            Invoke-Lint
+            Invoke-Typecheck
+            Invoke-Test
+        }
+        'run' { Invoke-Tool 'uvicorn' @('{{ package_name }}.main:app', '--reload', '--host', '127.0.0.1', '--port', '8000') }
+        'docker-build' {
+            docker build -t '{{ project_slug }}:local' .
+            if ($LASTEXITCODE -ne 0) { throw 'docker build failed' }
+        }
+        'clean' {
+            foreach ($path in @($Venv, '.pytest_cache', '.mypy_cache', '.ruff_cache', '.coverage', 'htmlcov')) {
+                if (Test-Path $path) { Remove-Item -Recurse -Force $path }
+            }
+        }
+    }
+}
+catch {
+    Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}

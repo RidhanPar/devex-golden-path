@@ -1,0 +1,29 @@
+"""{{ project_name }}: HTTP entry point."""
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from {{ package_name }} import __version__
+
+app = FastAPI(title="{{ project_name }}", version=__version__)
+
+
+class Health(BaseModel):
+    status: str
+    version: str
+
+
+class Greeting(BaseModel):
+    message: str
+
+
+@app.get("/health")
+def health() -> Health:
+    """Liveness probe used by Docker HEALTHCHECK and the deploy platform."""
+    return Health(status="ok", version=__version__)
+
+
+@app.get("/hello")
+def hello(name: str = "world") -> Greeting:
+    """Return a greeting for ``name``."""
+    return Greeting(message=f"Hello, {name}!")

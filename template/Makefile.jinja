@@ -1,0 +1,43 @@
+# Developer commands for Linux / macOS / devcontainer.
+# Windows equivalent: ./dev.ps1 <command>  (same command names, same behaviour)
+
+PYTHON ?= python3
+VENV   := .venv
+BIN    := $(VENV)/bin
+
+.DEFAULT_GOAL := help
+.PHONY: help setup lint format typecheck test check run docker-build clean
+
+help: ## Show available commands
+	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
+
+setup: ## Create .venv, install dependencies and git hooks
+	@$(PYTHON) -m venv $(VENV)
+	@$(BIN)/python -m pip install --quiet --upgrade pip
+	@$(BIN)/python -m pip install --quiet -r requirements-dev.txt -e .
+	@if [ -d .git ]; then $(BIN)/pre-commit install; else echo "Not a git repo yet: run 'git init' then 'make setup' to install hooks"; fi
+
+lint: ## Ruff lint + format check (no changes)
+	@$(BIN)/ruff check .
+	@$(BIN)/ruff format --check .
+
+format: ## Auto-fix lint issues and format code
+	@$(BIN)/ruff check --fix .
+	@$(BIN)/ruff format .
+
+typecheck: ## mypy in strict mode
+	@$(BIN)/mypy
+
+test: ## pytest with coverage threshold
+	@$(BIN)/pytest
+
+check: lint typecheck test ## Everything CI runs on code (lint, typecheck, test)
+
+run: ## Run the service with auto-reload on http://127.0.0.1:8000
+	@$(BIN)/uvicorn {{ package_name }}.main:app --reload --host 127.0.0.1 --port 8000
+
+docker-build: ## Build the container image
+	@docker build -t {{ project_slug }}:local .
+
+clean: ## Remove virtualenv and caches
+	@rm -rf $(VENV) .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov

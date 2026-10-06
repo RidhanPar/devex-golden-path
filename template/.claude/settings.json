@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(./secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa*)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Bash(cat .env*)",
+      "Bash(type .env*)",
+      "Bash(printenv:*)",
+      "Bash(git push:*)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(pip install:*)",
+      "Bash(docker:*)",
+      "Edit(./requirements.txt)",
+      "Edit(./requirements-dev.txt)",
+      "Edit(./.github/**)",
+      "Edit(./.claude/**)"
+    ],
+    "allow": [
+      "Bash(make lint)",
+      "Bash(make format)",
+      "Bash(make typecheck)",
+      "Bash(make test)",
+      "Bash(make check)",
+      "Bash(./dev.ps1 lint)",
+      "Bash(./dev.ps1 format)",
+      "Bash(./dev.ps1 typecheck)",
+      "Bash(./dev.ps1 test)",
+      "Bash(./dev.ps1 check)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint_after_edit.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+# {{ project_name }}: conventions for AI coding agents
+
+{{ description }} Owned by the **{{ owner_team }}** team. Generated from the
+[DevEx golden path](https://github.com/{{ github_org }}/devex-golden-path); read `AI_USAGE.md` for what
+you may and may not do.
+
+## Commands (identical names on every OS)
+
+| Task | Linux / macOS / devcontainer | Windows |
+|---|---|---|
+| Install everything | `make setup` | `./dev.ps1 setup` |
+| Lint + format check | `make lint` | `./dev.ps1 lint` |
+| Auto-fix + format | `make format` | `./dev.ps1 format` |
+| Type check | `make typecheck` | `./dev.ps1 typecheck` |
+| Tests + coverage | `make test` | `./dev.ps1 test` |
+| All of the above | `make check` | `./dev.ps1 check` |
+| Run locally | `make run` | `./dev.ps1 run` |
+
+Run `check` before declaring a task finished. A task is not done while `check` fails.
+
+## Layout
+
+- `src/{{ package_name }}/main.py`: FastAPI app and routes.
+- `tests/`: pytest tests, one `test_<module>.py` per module.
+- `requirements.txt`: pinned runtime dependencies (the single source of truth; `pyproject.toml` reads it).
+- `requirements-dev.txt`: pinned dev tooling.
+
+## Code conventions
+
+- Python {{ python_version }}, `src/` layout, absolute imports (`from {{ package_name }}.x import y`).
+- Every function has type annotations; mypy runs in `--strict` mode. No `Any` and no bare
+  `# type: ignore`: if one is unavoidable, add the error code and a reason.
+- Request and response bodies are Pydantic models, never raw `dict`.
+- Ruff decides formatting and import order. Don't hand-format; a hook runs ruff after every edit.
+- Configuration comes from environment variables. Variables in use: `LOG_LEVEL`.
+  Never hard-code URLs, tokens or credentials.
+
+## Testing conventions
+
+- Test through the public interface: HTTP routes via `fastapi.testclient.TestClient`.
+- Every behaviour change ships with a test that fails without the change.
+- Coverage must stay at or above {{ coverage_threshold }}% (enforced by pytest and CI).
+- Never delete or weaken a test to make the suite pass.
+
+## Off-limits
+
+- `.env`, `.env.*`, `secrets/`, keys and certificates: reading them is blocked by
+  `.claude/settings.json`. Don't try to work around it.
+- `git push`: blocked. Humans push and open pull requests.
+- Changes to dependencies, `.github/`, `.claude/` or `Dockerfile` need explicit human approval
+  (see `AI_USAGE.md`).

@@ -1,0 +1,4 @@
+# Runtime dependencies, pinned. Single source of truth: pyproject.toml reads this file.
+# Pinned versions make builds reproducible and let SCA scanners (Trivy, dependency review) see exact versions.
+fastapi==0.142.2
+uvicorn==0.54.0

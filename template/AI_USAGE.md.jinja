@@ -1,0 +1,59 @@
+# AI usage policy
+
+This policy applies to every AI coding tool used on **{{ project_name }}** (Claude Code, Copilot,
+Cursor, ChatGPT and others). The rules for Claude Code are enforced technically by
+`.claude/settings.json`; for other tools they are a team agreement checked in code review.
+
+**The principle: the human who merges a change owns it.** AI changes how code is written,
+not who is accountable for it.
+
+## 1. What AI agents may do without asking
+
+- Read and edit application code in `src/` and tests in `tests/`.
+- Run the standard commands: `lint`, `format`, `typecheck`, `test`, `check`.
+- Read git history and diffs.
+- Draft commit messages, PR descriptions, docs and ADRs for a human to edit.
+
+## 2. What always needs human review before merge
+
+All AI-assisted changes go through a normal pull request with at least one human approval.
+These areas also need the reviewer to explicitly confirm they checked them:
+
+| Area | Why |
+|---|---|
+| New or upgraded dependencies (`requirements*.txt`) | Supply-chain risk; AI tools have suggested packages that do not exist ("slopsquatting"). |
+| CI/CD and repo config (`.github/`, `Dockerfile`, `.pre-commit-config.yaml`) | Can disable the safety gates for everyone. |
+| AI tool config (`.claude/`, `CLAUDE.md`, this file) | Changes what the agent is allowed to do. |
+| Authentication, authorisation, cryptography | Subtle bugs here are security incidents. |
+| Anything handling personal or customer data | Legal and privacy obligations. |
+| Database migrations and deletes | Hard to reverse. |
+
+Agents never push, merge, tag releases or deploy. `git push` is denied in `.claude/settings.json`.
+
+## 3. Testing rules
+
+- AI-written code meets the same bar as human code: `check` passes and CI is green.
+- Every behaviour change includes a test that fails without the change.
+- An agent must never delete, skip or weaken a test to make a build pass. If a test looks
+  wrong, the agent stops and asks.
+- The reviewer reads the tests first: they are the specification the AI was working to.
+
+## 4. Data and secrets rules
+
+- Never paste secrets, credentials, customer data or personal data into any AI tool,
+  chat or prompt, including "just for debugging".
+- Agents are blocked from reading `.env`, `.env.*`, `secrets/`, `*.pem`, `*.key`.
+  This is defence in depth, not a guarantee: secrets belong in a secrets manager, and
+  gitleaks runs in pre-commit and CI.
+- Use obviously fake values in tests and examples (`test-token-not-real`).
+- Use only AI tools approved by the organisation, on plans where our code is not used
+  for model training.
+- If a secret is exposed to an AI tool or committed, treat it as leaked: rotate it
+  immediately and tell the security owner. Deleting the commit isn't enough.
+
+## 5. Attribution
+
+Mark substantially AI-generated commits with a `Co-Authored-By:` trailer naming the tool, so
+that we can measure the effect of AI tooling on quality and speed later.
+
+_Owner: {{ owner_team }} team. Review this policy every 6 months or when adopting a new AI tool._

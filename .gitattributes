@@ -1,0 +1,3 @@
+# Same bytes on every OS: no CRLF churn in diffs between Windows and Linux developers.
+* text=auto eol=lf
+*.png binary

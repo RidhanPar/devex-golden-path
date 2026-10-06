@@ -1,0 +1,23 @@
+from fastapi.testclient import TestClient
+
+from {{ package_name }} import __version__
+from {{ package_name }}.main import app
+
+client = TestClient(app)
+
+
+def test_health_reports_ok_and_version() -> None:
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "version": __version__}
+
+
+def test_hello_defaults_to_world() -> None:
+    response = client.get("/hello")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello, world!"}
+
+
+def test_hello_uses_name_parameter() -> None:
+    response = client.get("/hello", params={"name": "Ada"})
+    assert response.json() == {"message": "Hello, Ada!"}

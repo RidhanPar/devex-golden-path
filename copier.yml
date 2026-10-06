@@ -1,0 +1,61 @@
+# Copier template for a new Python service on the golden path.
+#
+#   copier copy --trust gh:RidhanPar/devex-golden-path my-service
+#
+# Answers are recorded in .copier-answers.yml inside the generated service so
+# that `copier update` can roll template improvements out to existing services.
+
+_min_copier_version: "9.0.0"
+_subdirectory: template
+_answers_file: .copier-answers.yml
+
+project_name:
+  type: str
+  help: Human-readable name of the service
+  default: Hello Service
+
+project_slug:
+  type: str
+  help: Repository / directory name (lowercase, dashes)
+  default: "{{ project_name | lower | replace(' ', '-') }}"
+  validator: >-
+    {% if not (project_slug | regex_search('^[a-z][a-z0-9-]*[a-z0-9]$')) %}
+    Must be lowercase letters, digits and dashes, starting with a letter.
+    {% endif %}
+
+package_name:
+  type: str
+  help: Python import name (lowercase, underscores)
+  default: "{{ project_slug | replace('-', '_') }}"
+  validator: >-
+    {% if not (package_name | regex_search('^[a-z][a-z0-9_]*$')) %}
+    Must be a valid Python identifier in lowercase.
+    {% endif %}
+
+description:
+  type: str
+  help: One-line description of what the service does
+  default: A FastAPI service generated from the DevEx golden path.
+
+owner_team:
+  type: str
+  help: Team that owns this service (used in CODEOWNERS-style docs)
+  default: platform
+
+python_version:
+  type: str
+  help: Python version used in Docker, devcontainer and CI
+  choices:
+    - "3.12"
+    - "3.13"
+  default: "3.13"
+
+github_org:
+  type: str
+  help: GitHub owner of the new repository
+  default: RidhanPar
+
+coverage_threshold:
+  type: int
+  help: Minimum test coverage (%) enforced in CI
+  default: 80
