@@ -10,3 +10,6 @@ __pycache__/
 
 # Personal Claude Code settings
 .claude/settings.local.json
+
+# Generated dashboard (built in CI and published to Pages)
+/site/

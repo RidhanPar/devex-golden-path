@@ -4,17 +4,19 @@
 line-length = 100
 target-version = "py312"
 extend-exclude = ["template"]
+src = ["scripts", "."]  # so script modules sort as first-party imports
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
+"dora/report.py" = ["E501"]  # embedded HTML/CSS/JS template
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["scripts", "tests"]
+files = ["scripts", "dora", "tests"]
 mypy_path = "scripts"
 
 [tool.pytest.ini_options]
