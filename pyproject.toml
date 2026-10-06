@@ -3,7 +3,7 @@
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["template"]
+extend-exclude = ["template", "measure"]  # tested by generating / running them
 src = ["scripts", "."]  # so script modules sort as first-party imports
 
 [tool.ruff.lint]
