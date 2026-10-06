@@ -28,6 +28,15 @@ def find_ruff(project_dir: Path) -> str | None:
     return shutil.which("ruff")
 
 
+def run_ruff(ruff: str, args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+    # Safe by construction: argv list (no shell), the executable is the project's own ruff,
+    # and the only external value is the edited file's path, passed as a single argument.
+    # nosemgrep: dangerous-subprocess-use-tainted-env-args
+    return subprocess.run(  # noqa: S603
+        [ruff, *args], cwd=cwd, capture_output=True, text=True, check=False
+    )
+
+
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
@@ -45,15 +54,8 @@ def main() -> int:
         return 0
 
     # Fix first, then format, so the formatter tidies up after removed imports.
-    # S603: arguments are a list (no shell) and the executable is the project's own ruff.
-    result = subprocess.run(  # noqa: S603
-        [ruff, "check", "--fix", "--quiet", file_path],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    subprocess.run([ruff, "format", "--quiet", file_path], cwd=project_dir, check=False)  # noqa: S603
+    result = run_ruff(ruff, ["check", "--fix", "--quiet", file_path], project_dir)
+    run_ruff(ruff, ["format", "--quiet", file_path], project_dir)
     if result.returncode != 0:
         print(f"ruff found issues in {file_path} that need a manual fix:", file=sys.stderr)
         print(result.stdout or result.stderr, file=sys.stderr)

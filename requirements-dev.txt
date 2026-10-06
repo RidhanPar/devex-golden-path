@@ -1,0 +1,4 @@
+# Tooling for the golden path repo itself (scripts, DORA tool, their tests). Pinned.
+mypy==2.4.0
+pytest==9.1.1
+ruff==0.16.10

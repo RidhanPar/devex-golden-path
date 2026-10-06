@@ -14,11 +14,17 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install --no-deps .
+# The service never installs packages at runtime, so the venv ships without pip.
+RUN pip install --no-deps . \
+ && pip uninstall --yes pip
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH="/opt/venv/bin:$PATH"
-RUN useradd --create-home --uid 10001 app
+# The base image's own pip (and the copy ensurepip keeps) vendor libraries such as urllib3 and
+# msgpack that the image scanner rightly flags. Nothing at runtime needs pip, so remove it.
+RUN /usr/local/bin/python -m pip uninstall --yes pip \
+ && rm -rf /usr/local/lib/python*/ensurepip \
+ && useradd --create-home --uid 10001 app
 COPY --from=builder /opt/venv /opt/venv
 USER app
 WORKDIR /home/app

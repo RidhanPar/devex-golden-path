@@ -1,0 +1,155 @@
+# CI for the golden path itself.
+#
+# On every change: generate a brand-new service from this commit of the template, then put it
+# through (1) the developer loop exactly as a person would on Linux and on Windows, and
+# (2) the same reusable pipeline every real service calls, using this commit's workflows.
+# A template or workflow change can only reach services (by moving the v1 tag) once this is green.
+name: template-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: template-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  SERVICE: golden-path-ci-service
+
+jobs:
+  actionlint:
+    name: lint workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 -color
+
+  tooling-tests:
+    name: golden path tooling tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m ruff check . && python -m ruff format --check .
+      - run: python -m mypy
+      - run: python -m pytest
+
+  generate:
+    name: generate service from template
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # copier renders from git, at this exact commit
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      - name: copier copy
+        run: |
+          uvx copier@9.18.2 copy --trust --defaults --vcs-ref HEAD \
+            -d project_name="Golden Path CI Service" . "out/$SERVICE"
+          find "out/$SERVICE" -type f | sort
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: generated-service
+          path: out/${{ env.SERVICE }}
+          include-hidden-files: true # .github, .claude, .pre-commit-config.yaml, ...
+          retention-days: 7
+
+  developer-loop:
+    name: developer loop (${{ matrix.os }})
+    needs: generate
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: generated-service
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: git init + first commit identity
+        run: |
+          git init -q -b main
+          git config user.name "golden-path-ci"
+          git config user.email "golden-path-ci@users.noreply.github.com"
+
+      - name: Linux - make setup, make check, commit through pre-commit hooks
+        if: runner.os != 'Windows'
+        run: |
+          make help
+          make setup
+          make check
+          git add -A
+          git commit -m "first commit"   # runs the installed pre-commit hooks for real
+
+      - name: Windows - dev.ps1 setup, check, commit through pre-commit hooks
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          ./dev.ps1 help
+          ./dev.ps1 setup; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./dev.ps1 check; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add -A
+          git commit -m "first commit"
+          exit $LASTEXITCODE
+
+  quality:
+    needs: generate
+    uses: ./.github/workflows/reusable-python-ci.yml
+    with:
+      source-artifact: generated-service
+
+  security:
+    needs: generate
+    uses: ./.github/workflows/reusable-security.yml
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    with:
+      source-artifact: generated-service
+
+  container:
+    needs: generate
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      source-artifact: generated-service
+
+  all-green:
+    name: Template CI passed
+    if: always()
+    needs: [actionlint, tooling-tests, generate, developer-loop, quality, security, container]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          echo "$RESULTS" | jq -e 'all(. == "success" or . == "skipped")'
