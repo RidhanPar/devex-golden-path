@@ -1,0 +1,118 @@
+# Reusable deploy job using GitHub OIDC: no long-lived cloud keys stored anywhere.
+#
+# What is APPLIED (runs on every push to main):
+#   1. Build and push the image to GitHub Container Registry (ghcr.io), authenticated with the
+#      job's short-lived GITHUB_TOKEN.
+#   2. Request a GitHub OIDC token and print its (non-secret) claims. These claims are exactly
+#      what a cloud trust policy matches on; see docs/deploy-oidc.md.
+#   3. The job runs in a GitHub Environment, so GitHub records a Deployment for every run.
+#      Those records feed the DORA metrics tool (phase 4).
+#
+# What is NOT APPLIED (no cloud account is connected to this portfolio):
+#   4. Exchange the OIDC token for Google Cloud credentials via Workload Identity Federation
+#      and deploy to Cloud Run. It runs only when the caller passes gcp-workload-identity-provider.
+name: reusable-deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub Environment to deploy to
+        type: string
+        default: production
+      enable-cache:
+        type: boolean
+        default: true
+      gcp-workload-identity-provider:
+        description: "NOT APPLIED by default. projects/<num>/locations/global/workloadIdentityPools/<pool>/providers/<provider>"
+        type: string
+        default: ""
+      gcp-service-account:
+        description: "NOT APPLIED by default. deployer@<project>.iam.gserviceaccount.com"
+        type: string
+        default: ""
+      gcp-region:
+        type: string
+        default: europe-west2
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    name: deploy (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ inputs.environment }}
+      url: https://github.com/${{ github.repository }}/pkgs/container/${{ github.event.repository.name }}
+    # The caller must grant: contents: read, packages: write, id-token: write.
+    concurrency:
+      group: deploy-${{ github.repository }}-${{ inputs.environment }}
+      cancel-in-progress: false # never cancel a deploy half-way
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Image name
+        id: img
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Log in to GHCR with the job's short-lived token
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.img.outputs.name }}:${{ github.sha }}
+            ${{ steps.img.outputs.name }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: ${{ inputs.enable-cache && 'type=gha,scope=service-image' || '' }}
+
+      - name: Request OIDC token and show its claims (token itself is never printed)
+        run: |
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "::error::No OIDC token available: the calling job needs 'permissions: id-token: write'"
+            exit 1
+          fi
+          token=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=golden-path-deploy" | jq -r .value)
+          echo "::add-mask::$token"
+          # Decode the JWT payload (base64url, may lack padding) and print the claims a cloud
+          # trust policy would check.
+          payload=$(echo "$token" | cut -d. -f2 | tr '_-' '/+')
+          while [ $(( ${#payload} % 4 )) -ne 0 ]; do payload="${payload}="; done
+          echo "$payload" | base64 -d | jq '{iss, aud, sub, repository, ref, environment, job_workflow_ref, exp}'
+
+      - name: Deploy to Cloud Run via Workload Identity Federation (NOT APPLIED unless configured)
+        if: inputs.gcp-workload-identity-provider == ''
+        run: |
+          echo "Cloud deploy is not configured for this repository, so it was skipped."
+          echo "The image above was pushed for real; see docs/deploy-oidc.md to connect a cloud."
+      - name: Authenticate to Google Cloud with OIDC
+        if: inputs.gcp-workload-identity-provider != ''
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ inputs.gcp-workload-identity-provider }}
+          service_account: ${{ inputs.gcp-service-account }}
+      - name: Deploy to Cloud Run
+        if: inputs.gcp-workload-identity-provider != ''
+        env:
+          IMAGE: ${{ steps.img.outputs.name }}:${{ github.sha }}
+          REGION: ${{ inputs.gcp-region }}
+          SERVICE: ${{ github.event.repository.name }}
+        run: gcloud run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --quiet

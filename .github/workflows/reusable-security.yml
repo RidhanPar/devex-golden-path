@@ -1,0 +1,166 @@
+# Reusable security gates for golden-path services.
+#
+#   sast              Semgrep (python + dockerfile rule packs)    code-level vulnerabilities
+#   sca               Trivy filesystem scan of pinned deps         known CVEs in dependencies
+#   dependency-review GitHub dependency review (PRs only)          new vulnerable deps in a PR
+#   secrets           gitleaks over the commits being added        leaked credentials
+#
+# Every gate blocks (non-zero exit). Scanners run as digest-pinned containers so a
+# compromised tag upstream cannot change what runs here.
+name: reusable-security
+
+on:
+  workflow_call:
+    inputs:
+      enable-cache:
+        description: Cache the Trivy vulnerability database between runs
+        type: boolean
+        default: true
+      source-artifact:
+        description: Internal (template self-test) - artifact holding the source to scan.
+        type: string
+        default: ""
+      fail-severity:
+        description: Minimum severity that fails the SCA and dependency-review gates
+        type: string
+        default: high
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  SEMGREP_IMAGE: semgrep/semgrep:1.179.0@sha256:93963d9295a366f59e4850127b1550400ee7b388f04fe144e4a1f6325d96e01b
+  TRIVY_IMAGE: aquasec/trivy:0.75.0@sha256:af6acf9a6b85dfe389a1941505c0ce9efef52a4719635e1a962f022a3d855daa
+  GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+
+jobs:
+  sast:
+    name: sast (semgrep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # upload SARIF to the Security tab
+      actions: read
+    steps:
+      - name: Check out source
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: Semgrep scan
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src "$SEMGREP_IMAGE" \
+            semgrep scan --config p/python --config p/dockerfile \
+            --metrics=off --error --sarif-output=semgrep.sarif --text
+      - name: Upload SARIF to code scanning
+        # Code scanning is free on public repos; on private repos without GitHub Advanced
+        # Security the upload fails, which must not hide the real result above.
+        if: always() && inputs.source-artifact == '' && hashFiles('semgrep.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  sca:
+    name: sca (trivy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: Day stamp for the Trivy DB cache
+        id: day
+        run: echo "day=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+      - name: Restore Trivy DB cache
+        if: inputs.enable-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ steps.day.outputs.day }}
+          restore-keys: trivy-db-
+
+      - name: Trivy scan of dependencies
+        env:
+          FAIL_SEVERITY: ${{ inputs.fail-severity }}
+        run: |
+          case "${FAIL_SEVERITY,,}" in
+            critical) severities=CRITICAL ;;
+            high)     severities=HIGH,CRITICAL ;;
+            *)        severities=MEDIUM,HIGH,CRITICAL ;;
+          esac
+          mkdir -p ~/.cache/trivy
+          docker run --rm -v "$PWD:/src" -v "$HOME/.cache/trivy:/root/.cache/trivy" "$TRIVY_IMAGE" \
+            fs --scanners vuln --severity "$severities" --ignore-unfixed --exit-code 1 /src
+
+  dependency-review:
+    name: dependency-review
+    # Compares the PR's dependency manifest against the base branch; only meaningful on PRs.
+    if: github.event_name == 'pull_request' && inputs.source-artifact == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: ${{ inputs.fail-severity }}
+
+  secrets:
+    name: secrets (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source (full history)
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: gitleaks
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SOURCE_ARTIFACT: ${{ inputs.source-artifact }}
+        run: |
+          # The container runs as a different user than the checkout owner; tell git that's fine.
+          run_gitleaks() {
+            docker run --rm -v "$PWD:/src" \
+              -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0='*' \
+              "$GITLEAKS_IMAGE" "$@" --redact --verbose --exit-code 1
+          }
+          if [ -n "$SOURCE_ARTIFACT" ]; then
+            run_gitleaks dir /src                                   # no git history: scan files
+          elif [ "$EVENT" = "pull_request" ]; then
+            run_gitleaks git /src --log-opts="$BASE_SHA..$HEAD_SHA"  # only the commits this PR adds
+          else
+            run_gitleaks git /src                                   # push: full history
+          fi

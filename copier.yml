@@ -59,3 +59,8 @@ coverage_threshold:
   type: int
   help: Minimum test coverage (%) enforced in CI
   default: 80
+
+golden_path_ref:
+  type: str
+  help: Version of the shared CI/CD workflows to use (a tag of devex-golden-path)
+  default: v1

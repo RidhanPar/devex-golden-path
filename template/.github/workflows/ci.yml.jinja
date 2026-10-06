@@ -1,0 +1,72 @@
+# CI/CD for {{ project_name }}.
+# The pipeline itself lives in the golden path repo and is versioned ({{ golden_path_ref }}):
+# fixes and new gates reach every service by moving that tag, not by editing 30 copies.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      enable-cache:
+        description: Use dependency, Docker layer and scanner caches
+        type: boolean
+        default: true
+
+{% raw -%}
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+{%- endraw %}
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    uses: {{ github_org }}/devex-golden-path/.github/workflows/reusable-python-ci.yml@{{ golden_path_ref }}
+    with:
+      python-version: "{{ python_version }}"
+      {% raw %}enable-cache: ${{ github.event_name != 'workflow_dispatch' || inputs.enable-cache }}{% endraw %}
+
+  security:
+    uses: {{ github_org }}/devex-golden-path/.github/workflows/reusable-security.yml@{{ golden_path_ref }}
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    with:
+      {% raw %}enable-cache: ${{ github.event_name != 'workflow_dispatch' || inputs.enable-cache }}{% endraw %}
+
+  container:
+    uses: {{ github_org }}/devex-golden-path/.github/workflows/reusable-docker.yml@{{ golden_path_ref }}
+    with:
+      {% raw %}enable-cache: ${{ github.event_name != 'workflow_dispatch' || inputs.enable-cache }}{% endraw %}
+
+  # The single required status check for branch protection. Required checks are matched by
+  # name, so depending on one stable aggregate job means the pipeline can gain or rename
+  # jobs without anyone editing branch protection on every repository.
+  all-green:
+    name: CI passed
+    if: always()
+    needs: [quality, security, container]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail unless every gate succeeded (skipped is OK, e.g. dependency-review on push)
+        env:
+          {% raw %}RESULTS: ${{ toJSON(needs.*.result) }}{% endraw %}
+        run: |
+          echo "$RESULTS"
+          echo "$RESULTS" | jq -e 'all(. == "success" or . == "skipped")'
+
+  deploy:
+    needs: [all-green]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: {{ github_org }}/devex-golden-path/.github/workflows/reusable-deploy.yml@{{ golden_path_ref }}
+    permissions:
+      contents: read
+      packages: write # push the image to ghcr.io
+      id-token: write # request the OIDC token
+    with:
+      environment: production

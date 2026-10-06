@@ -1,0 +1,156 @@
+# Reusable quality pipeline for golden-path Python services.
+#
+# Called from a service's .github/workflows/ci.yml:
+#   uses: RidhanPar/devex-golden-path/.github/workflows/reusable-python-ci.yml@v1
+#
+# Principle: CI runs the same commands developers run locally (make / dev.ps1),
+# so "green on my machine" and "green in CI" mean the same thing.
+name: reusable-python-ci
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: Python version to test with
+        type: string
+        default: "3.13"
+      enable-cache:
+        description: Restore/save the virtualenv cache (set false to measure cold runs)
+        type: boolean
+        default: true
+      source-artifact:
+        description: >-
+          Internal: name of an artifact holding the source to test instead of checking out the
+          caller repository. Used by the template's own CI to test freshly generated services.
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: Set up Python
+        id: py
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Restore virtualenv cache
+        if: inputs.enable-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements*.txt', 'pyproject.toml') }}
+
+      - run: make setup
+      - run: make lint
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: Set up Python
+        id: py
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Restore virtualenv cache
+        if: inputs.enable-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements*.txt', 'pyproject.toml') }}
+
+      - run: make setup
+      - run: make typecheck
+
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    env:
+      # Keep the coverage threshold from pyproject.toml, and also write coverage.xml.
+      PYTEST_ADDOPTS: --cov-report=xml
+    steps:
+      - name: Check out source
+        if: inputs.source-artifact == ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download generated source
+        if: inputs.source-artifact != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.source-artifact }}
+
+      - name: Set up Python
+        id: py
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Restore virtualenv cache
+        if: inputs.enable-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-py${{ steps.py.outputs.python-version }}-${{ hashFiles('requirements*.txt', 'pyproject.toml') }}
+
+      # Linux uses the Makefile, Windows uses dev.ps1 in Windows PowerShell 5.1:
+      # exactly what developers on each OS run.
+      - name: Setup and test (Linux)
+        if: runner.os != 'Windows'
+        run: |
+          make setup
+          make test
+      - name: Setup and test (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          ./dev.ps1 setup
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./dev.ps1 test
+          exit $LASTEXITCODE
+
+      - name: Upload coverage report
+        if: always() && runner.os != 'Windows'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-${{ inputs.source-artifact || 'service' }}
+          path: coverage.xml
+          if-no-files-found: ignore
+          retention-days: 14
