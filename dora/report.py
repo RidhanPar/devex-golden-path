@@ -57,11 +57,11 @@ def metrics_dict(m: RepoMetrics) -> dict[str, Any]:
         "attempts": m.attempts,
         "successes": m.successes,
         "deploys_per_week": round(m.deploys_per_week, 3),
-        "lead_time_hours": [round(h, 3) for h in m.lead_time_hours],
+        "lead_time_hours": [round(h, 6) for h in m.lead_time_hours],
         "median_lead_time_hours": m.median_lead_time_hours,
         "failures": m.failures,
         "change_failure_rate": m.change_failure_rate,
-        "restore_hours": [round(h, 3) for h in m.restore_hours],
+        "restore_hours": [round(h, 6) for h in m.restore_hours],
         "median_restore_hours": m.median_restore_hours,
         "unrestored_failures": m.unrestored_failures,
     }
