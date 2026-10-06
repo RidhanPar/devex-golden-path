@@ -62,5 +62,5 @@ coverage_threshold:
 
 golden_path_ref:
   type: str
-  help: Version of the shared CI/CD workflows to use (a tag of devex-golden-path)
+  help: Release branch of the shared CI/CD workflows to use (see docs/releasing.md)
   default: v1

@@ -36,20 +36,24 @@ sequenceDiagram
 | Requests an OIDC token and prints its claims (never the token) | **Applied** |
 | Exchanges the token for Google Cloud credentials and deploys to Cloud Run | **Not applied.** No cloud account is connected to this portfolio. Runs only when `gcp-workload-identity-provider` is passed. |
 
-The claims printed by the applied step are visible in the deploy job log of the demo service
-(see the README for the link). Their shape:
+The claims printed by the applied step, copied from a real run of the demo service's deploy
+job ([run 37501160610](https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37501160610)):
 
 ```json
 {
   "iss": "https://token.actions.githubusercontent.com",
   "aud": "golden-path-deploy",
-  "sub": "repo:OWNER/SERVICE:environment:production",
-  "repository": "OWNER/SERVICE",
+  "sub": "repo:RidhanPar@129787911/golden-path-demo-service@1406865764:environment:production",
+  "repository": "RidhanPar/golden-path-demo-service",
   "ref": "refs/heads/main",
   "environment": "production",
-  "job_workflow_ref": "RidhanPar/devex-golden-path/.github/workflows/reusable-deploy.yml@refs/tags/v1"
+  "job_workflow_ref": "RidhanPar/devex-golden-path/.github/workflows/reusable-deploy.yml@refs/heads/v1"
 }
 ```
+
+The `sub` claim includes immutable owner and repository IDs (`@129787911`, `@1406865764`). A
+trust policy that matches on `sub` therefore can't be inherited by someone who deletes the
+repository and re-creates one with the same name.
 
 `job_workflow_ref` is the key claim for a platform team. A trust policy can require that the
 token came from **the golden path's reviewed deploy workflow**, not from any workflow someone
@@ -68,7 +72,7 @@ gcloud iam workload-identity-pools providers create-oidc golden-path \
   --location=global --workload-identity-pool=github \
   --issuer-uri=https://token.actions.githubusercontent.com \
   --attribute-mapping=google.subject=assertion.sub,attribute.repository=assertion.repository \
-  --attribute-condition="assertion.repository_owner == 'RidhanPar' && assertion.environment == 'production' && assertion.job_workflow_ref.startsWith('RidhanPar/devex-golden-path/.github/workflows/reusable-deploy.yml@refs/tags/v')"
+  --attribute-condition="assertion.repository_owner == 'RidhanPar' && assertion.environment == 'production' && assertion.job_workflow_ref == 'RidhanPar/devex-golden-path/.github/workflows/reusable-deploy.yml@refs/heads/v1'"
 
 gcloud iam service-accounts create deployer
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \

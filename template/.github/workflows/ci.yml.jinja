@@ -1,6 +1,6 @@
 # CI/CD for {{ project_name }}.
-# The pipeline itself lives in the golden path repo and is versioned ({{ golden_path_ref }}):
-# fixes and new gates reach every service by moving that tag, not by editing 30 copies.
+# The pipeline itself lives in the golden path repo, on its {{ golden_path_ref }} release branch:
+# fixes and new gates reach every service when that branch moves forward, not by editing 30 copies.
 name: CI
 
 on:
