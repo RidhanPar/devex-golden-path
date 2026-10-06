@@ -50,7 +50,12 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       url: https://github.com/${{ github.repository }}/pkgs/container/${{ github.event.repository.name }}
-    # The caller must grant: contents: read, packages: write, id-token: write.
+    # Declared at job level: the workflow-level `contents: read` above would otherwise cap the
+    # token, whatever the caller grants. The caller must also grant these (it can only narrow).
+    permissions:
+      contents: read
+      packages: write # push the image to ghcr.io
+      id-token: write # request the OIDC token
     concurrency:
       group: deploy-${{ github.repository }}-${{ inputs.environment }}
       cancel-in-progress: false # never cancel a deploy half-way
