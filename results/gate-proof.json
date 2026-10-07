@@ -1,17 +1,15 @@
 {
   "repository": "RidhanPar/golden-path-demo-service",
-  "run_started_utc": "2026-10-07T08:20:09",
+  "run_started_utc": "2026-10-07T08:23:04",
   "results": [
     {
       "scenario": "control",
       "description": "Harmless README change",
       "expected_gates": [],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/11",
-      "head_sha": "ce4bea5e7878fa5a6cc0d9ea858452cf10eb2838",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/17",
+      "head_sha": "0dd61e285ae3b6a640744ee658b1e160f74acfa2",
       "failed_checks": [],
       "passed_checks": [
-        "GitGuardian Security Checks",
-        "Semgrep OSS",
         "container / build + image scan + smoke test",
         "quality / lint",
         "quality / test (ubuntu-latest)",
@@ -25,6 +23,7 @@
       "skipped_checks": [
         "deploy"
       ],
+      "other_app_failures": [],
       "merge_blocked": false,
       "verdict": "PASS: nothing blocked"
     },
@@ -34,14 +33,12 @@
       "expected_gates": [
         "security / secrets (gitleaks)"
       ],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/12",
-      "head_sha": "bdad8410987b041ec2f34c79f9c3e3cd19c50d2e",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/18",
+      "head_sha": "65b8f1cc7d156f262bd03057796c3d9f51193349",
       "failed_checks": [
-        "GitGuardian Security Checks",
         "security / secrets (gitleaks)"
       ],
       "passed_checks": [
-        "Semgrep OSS",
         "container / build + image scan + smoke test",
         "quality / lint",
         "quality / test (ubuntu-latest)",
@@ -53,6 +50,9 @@
       ],
       "skipped_checks": [
         "deploy"
+      ],
+      "other_app_failures": [
+        "GitGuardian Security Checks (gitguardian)"
       ],
       "merge_blocked": true,
       "verdict": "CAUGHT by all expected gates"
@@ -64,16 +64,14 @@
         "security / sca (trivy)",
         "security / dependency-review"
       ],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/13",
-      "head_sha": "fd7c9a8bc511ecf20ab9fa4636ddb3db733cd0ab",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/19",
+      "head_sha": "d7decf953035fd71971818d7fe059a292e61fda3",
       "failed_checks": [
         "container / build + image scan + smoke test",
         "security / dependency-review",
         "security / sca (trivy)"
       ],
       "passed_checks": [
-        "GitGuardian Security Checks",
-        "Semgrep OSS",
         "quality / lint",
         "quality / test (ubuntu-latest)",
         "quality / test (windows-latest)",
@@ -84,6 +82,7 @@
       "skipped_checks": [
         "deploy"
       ],
+      "other_app_failures": [],
       "merge_blocked": true,
       "verdict": "CAUGHT by all expected gates"
     },
@@ -93,15 +92,13 @@
       "expected_gates": [
         "security / sast (semgrep)"
       ],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/14",
-      "head_sha": "f4932faedc4ba7251ed2d8e8d48265faa3a017cb",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/20",
+      "head_sha": "d57e0a34f68f93442752c271c978b9ca31268101",
       "failed_checks": [
-        "Semgrep OSS",
         "quality / lint",
         "security / sast (semgrep)"
       ],
       "passed_checks": [
-        "GitGuardian Security Checks",
         "container / build + image scan + smoke test",
         "quality / test (ubuntu-latest)",
         "quality / test (windows-latest)",
@@ -112,6 +109,9 @@
       ],
       "skipped_checks": [
         "deploy"
+      ],
+      "other_app_failures": [
+        "Semgrep OSS (github-advanced-security)"
       ],
       "merge_blocked": true,
       "verdict": "CAUGHT by all expected gates"
@@ -123,15 +123,13 @@
         "quality / test (ubuntu-latest)",
         "quality / test (windows-latest)"
       ],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/15",
-      "head_sha": "b3871f4d765bbae4a7dbecc9aa06d8ba9f7afdf6",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/21",
+      "head_sha": "a706ad01ee95d4218bdf69f274310af134069644",
       "failed_checks": [
         "quality / test (ubuntu-latest)",
         "quality / test (windows-latest)"
       ],
       "passed_checks": [
-        "GitGuardian Security Checks",
-        "Semgrep OSS",
         "container / build + image scan + smoke test",
         "quality / lint",
         "quality / typecheck",
@@ -143,6 +141,7 @@
       "skipped_checks": [
         "deploy"
       ],
+      "other_app_failures": [],
       "merge_blocked": true,
       "verdict": "CAUGHT by all expected gates"
     },
@@ -152,14 +151,12 @@
       "expected_gates": [
         "quality / typecheck"
       ],
-      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/16",
-      "head_sha": "decb08267e5c6cc02a33f25a955cd3298d9ef1d7",
+      "pr_url": "https://github.com/RidhanPar/golden-path-demo-service/pull/22",
+      "head_sha": "a9bec8d52043070aab5be7f7e7bb68676c858b92",
       "failed_checks": [
         "quality / typecheck"
       ],
       "passed_checks": [
-        "GitGuardian Security Checks",
-        "Semgrep OSS",
         "container / build + image scan + smoke test",
         "quality / lint",
         "quality / test (ubuntu-latest)",
@@ -172,6 +169,7 @@
       "skipped_checks": [
         "deploy"
       ],
+      "other_app_failures": [],
       "merge_blocked": true,
       "verdict": "CAUGHT by all expected gates"
     }

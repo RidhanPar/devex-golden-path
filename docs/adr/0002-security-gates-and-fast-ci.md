@@ -27,7 +27,7 @@ All gates **block** (non-zero exit), at threshold *HIGH, fixed version available
 on unfixable findings would fail builds nobody can fix, which trains people to ignore the
 gate.
 
-Every gate was proven by a pull request that deliberately broke it (`docs/gate-proof.md`).
+Every gate was proven by a pull request that deliberately broke it (`docs/gate-proof.md`: 5 breakages, all blocked, plus a control PR that passed).
 The first real run also proved the image gate useful: it found 4 HIGH CVEs in libraries
 vendored inside the base image's `pip`. The fix was to remove pip from the runtime image,
 not to suppress the findings.

@@ -91,15 +91,15 @@ by a real pull request that deliberately broke it
 
 | Gate | Tool | Catches | Proven by |
 |---|---|---|---|
-| Lint + format | ruff (incl. bandit-style `S` rules) | Style, common bugs, some insecure patterns | first real run (S603 on a subprocess call) |
-| Type check | mypy `--strict` | Type errors that tests miss | [PR #10](https://github.com/RidhanPar/golden-path-demo-service/pull/10): function returned a method, not a `str` |
-| Tests | pytest + 80% coverage, **Linux and Windows** | Behaviour regressions | [PR #9](https://github.com/RidhanPar/golden-path-demo-service/pull/9): failed on both OSes |
-| SAST | Semgrep (`p/python`, `p/dockerfile`) | Insecure code patterns | first real run (subprocess with external input) |
-| SCA | Trivy filesystem scan | Known CVEs in pinned dependencies | [PR #8](https://github.com/RidhanPar/golden-path-demo-service/pull/8): `urllib3==1.24.1` |
-| Dependency review | GitHub dependency review (PRs) | Vulnerable dependencies a PR introduces | [PR #8](https://github.com/RidhanPar/golden-path-demo-service/pull/8) |
-| Secrets | gitleaks (PR commits; also pre-commit) | Committed credentials | [PR #7](https://github.com/RidhanPar/golden-path-demo-service/pull/7): hard-coded API key |
-| Container | Buildx + Trivy image scan + smoke test | OS/library CVEs in the image; an image that doesn't start | [PR #8](https://github.com/RidhanPar/golden-path-demo-service/pull/8); first real run found 4 HIGH CVEs in the base image's pip |
-| Control | — | Proves the gates don't block everything | [PR #6](https://github.com/RidhanPar/golden-path-demo-service/pull/6): harmless change, all green, mergeable |
+| Lint + format | ruff (incl. bandit-style `S` rules) | Style, common bugs, some insecure patterns | [PR #20](https://github.com/RidhanPar/golden-path-demo-service/pull/20): `shell=True` (S602), also caught by SAST |
+| Type check | mypy `--strict` | Type errors that tests miss | [PR #22](https://github.com/RidhanPar/golden-path-demo-service/pull/22): function returned a method, not a `str` |
+| Tests | pytest + 80% coverage, **Linux and Windows** | Behaviour regressions | [PR #21](https://github.com/RidhanPar/golden-path-demo-service/pull/21): failed on both OSes |
+| SAST | Semgrep (`p/python`, `p/dockerfile`) | Insecure code patterns | [PR #20](https://github.com/RidhanPar/golden-path-demo-service/pull/20): shell injection via `subprocess(..., shell=True)` |
+| SCA | Trivy filesystem scan | Known CVEs in pinned dependencies | [PR #19](https://github.com/RidhanPar/golden-path-demo-service/pull/19): `urllib3==1.24.1` |
+| Dependency review | GitHub dependency review (PRs) | Vulnerable dependencies a PR introduces | [PR #19](https://github.com/RidhanPar/golden-path-demo-service/pull/19) |
+| Secrets | gitleaks (PR commits; also pre-commit) | Committed credentials | [PR #18](https://github.com/RidhanPar/golden-path-demo-service/pull/18): hard-coded API key |
+| Container | Buildx + Trivy image scan + smoke test | OS/library CVEs in the image; an image that doesn't start | [PR #19](https://github.com/RidhanPar/golden-path-demo-service/pull/19); first real run found 4 HIGH CVEs in the base image's pip |
+| Control | — | Proves the gates don't block everything | [PR #17](https://github.com/RidhanPar/golden-path-demo-service/pull/17): harmless change, all green, mergeable |
 
 Supply chain of the pipeline itself: every action is pinned to a commit SHA, every scanner
 image to a digest, and deploys use OIDC with no stored cloud keys
@@ -138,8 +138,9 @@ All from 2026-10-06/07, on GitHub-hosted runners. Raw data is in [`results/`](re
    experiment: the Semgrep job went 35 → 19 s and wall-clock 61 → 50 s. The critical path is now
    the Windows test job (~40 s), the next candidate.
 
-**Gate proof:** 4 of 4 deliberate breakages blocked by the expected gates; the control PR
-passed. The first proof run also caught a flaw in the setup: dependency review fails on every
+**Gate proof:** 5 of 5 deliberate breakages blocked by the expected gates; the control PR
+passed. (GitGuardian, an app on my account, also flagged the secret; it's reported
+separately and not counted.) The first proof run also caught a flaw in the setup: dependency review fails on every
 PR when a new repo's dependency graph is off. The setup script now enables it
 ([run-1 data](results/gate-proof-run1-dependency-graph-off.json)).
 
