@@ -74,3 +74,10 @@ def test_judge(expected: list[str], failed: list[str], verdict: str) -> None:
     result = make_result(expected, failed)
     pg.judge(result)
     assert result.verdict == verdict
+
+
+def test_insecure_code_adds_shell_true_subprocess(service: Path) -> None:
+    pg.insecure_code(service, "svc")
+    text = (service / "src" / "svc" / "diagnostics.py").read_text()
+    assert "shell=True" in text
+    assert 'f"ping -c 1 {host}"' in text

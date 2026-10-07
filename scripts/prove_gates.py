@@ -98,6 +98,17 @@ def type_error(repo: Path, pkg: str) -> None:
         )
 
 
+def insecure_code(repo: Path, pkg: str) -> None:
+    # Shell injection: user input goes into a shell command. Three statements, so the
+    # coverage threshold still passes and only security-aware gates should object.
+    (repo / "src" / pkg / "diagnostics.py").write_text(
+        "import subprocess\n\n\n"
+        "def ping(host: str) -> str:\n"
+        '    return subprocess.run(f"ping -c 1 {host}", shell=True, text=True).stdout\n',
+        encoding="utf-8",
+    )
+
+
 SCENARIOS = [
     Scenario("control", "Harmless README change", [], control),
     Scenario(
@@ -111,6 +122,12 @@ SCENARIOS = [
         "Adds urllib3==1.24.1 (known HIGH CVEs)",
         ["security / sca (trivy)", "security / dependency-review"],
         vulnerable_dependency,
+    ),
+    Scenario(
+        "insecure-code",
+        "Shell injection: user input passed to subprocess with shell=True",
+        ["security / sast (semgrep)"],
+        insecure_code,
     ),
     Scenario(
         "failing-test",
