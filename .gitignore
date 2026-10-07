@@ -13,3 +13,7 @@ __pycache__/
 
 # Generated dashboard (built in CI and published to Pages)
 /site/
+.claude/launch.json
+
+# Personal notes (interview prep), not part of the project
+/notes/
