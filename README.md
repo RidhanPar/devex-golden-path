@@ -24,7 +24,7 @@ testing.
 ## The golden path in one picture
 
 ```mermaid
-flowchart LR
+flowchart TB
     dev([Engineer]) -->|"copier copy (1 command)"| svc
 
     subgraph gp["devex-golden-path (this repo)"]
