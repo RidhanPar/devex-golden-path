@@ -19,27 +19,37 @@ What the golden path provides instead of hand-written code (2026-10-07T06:42:10Z
 
 **Reading it honestly:** on machine time the golden path is slower, because it runs 9 gates instead of 2. A script can't time a person writing the baseline's files, or the extra gates; it can only count them.
 
-## CI duration with and without caching (2026-10-07T06:42:25Z)
+## CI duration with and without caching (2026-10-07T08:08:33Z)
 
 `RidhanPar/golden-path-demo-service`: one warm-up run, then 3 uncached/cached pairs, alternating, all triggered with `workflow_dispatch`.
 
 | Median | Caching off | Caching on |
 |---|---|---|
-| Total runner time (sum of jobs) | 208 s | 181 s |
-| Wall-clock (includes queueing) | 63 s | 61 s |
+| Total runner time (sum of jobs) | 202 s | 158 s |
+| Wall-clock (includes queueing) | 55 s | 50 s |
 
 Per job (median seconds):
 
 | Job | Off | On |
 |---|---|---|
-| `CI passed` | 3 | 3 |
-| `container / build + image scan + smoke test` | 43 | 30 |
-| `quality / lint` | 18 | 14 |
-| `quality / test (ubuntu-latest)` | 22 | 19 |
-| `quality / test (windows-latest)` | 50 | 37 |
-| `quality / typecheck` | 24 | 15 |
-| `security / sast (semgrep)` | 30 | 35 |
-| `security / sca (trivy)` | 22 | 16 |
-| `security / secrets (gitleaks)` | 8 | 5 |
+| `CI passed` | 3 | 2 |
+| `container / build + image scan + smoke test` | 40 | 29 |
+| `quality / lint` | 19 | 16 |
+| `quality / test (ubuntu-latest)` | 24 | 18 |
+| `quality / test (windows-latest)` | 41 | 40 |
+| `quality / typecheck` | 22 | 19 |
+| `security / sast (semgrep)` | 21 | 19 |
+| `security / sca (trivy)` | 18 | 13 |
+| `security / secrets (gitleaks)` | 9 | 7 |
 
 Raw samples, with run links: [`results/dx-cache.json`](../results/dx-cache.json).
+
+## Before and after: Semgrep from PyPI instead of its container image
+
+The first caching run showed Semgrep had become the slowest job; its step timings showed the image pull took 19 of ~22 seconds while the scan took ~1.5. v1.2.0 installs Semgrep with `uvx` at a pinned version, with a cache. Same experiment, same repository: [before](../results/dx-cache-v1.1.1.json) (2026-10-07T06:42:25Z) vs after (2026-10-07T08:08:33Z).
+
+| Median | v1.1.1 off | v1.1.1 on | v1.2.0 off | v1.2.0 on |
+|---|---|---|---|---|
+| `security / sast (semgrep)` job | 30 s | 35 s | 21 s | 19 s |
+| Total runner time | 208 s | 181 s | 202 s | 158 s |
+| Wall-clock | 63 s | 61 s | 55 s | 50 s |

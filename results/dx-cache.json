@@ -1,0 +1,138 @@
+{
+  "experiment": "cache",
+  "started": "2026-10-07T08:08:33Z",
+  "repo": "RidhanPar/golden-path-demo-service",
+  "runs_per_arm": 3,
+  "warmup": {
+    "enable_cache": true,
+    "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37591808090",
+    "conclusion": "success",
+    "wall_seconds": 52,
+    "job_seconds_total": 180,
+    "jobs_seconds": {
+      "quality / lint": 11,
+      "quality / typecheck": 19,
+      "security / sca (trivy)": 13,
+      "quality / test (ubuntu-latest)": 20,
+      "quality / test (windows-latest)": 41,
+      "container / build + image scan + smoke test": 38,
+      "security / secrets (gitleaks)": 10,
+      "security / sast (semgrep)": 25,
+      "CI passed": 3
+    }
+  },
+  "samples": [
+    {
+      "enable_cache": false,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37591926338",
+      "conclusion": "success",
+      "wall_seconds": 62,
+      "job_seconds_total": 197,
+      "jobs_seconds": {
+        "security / sca (trivy)": 17,
+        "quality / test (ubuntu-latest)": 24,
+        "container / build + image scan + smoke test": 37,
+        "security / sast (semgrep)": 22,
+        "security / secrets (gitleaks)": 5,
+        "quality / test (windows-latest)": 51,
+        "quality / lint": 19,
+        "quality / typecheck": 20,
+        "CI passed": 2
+      }
+    },
+    {
+      "enable_cache": true,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37592049490",
+      "conclusion": "success",
+      "wall_seconds": 84,
+      "job_seconds_total": 158,
+      "jobs_seconds": {
+        "container / build + image scan + smoke test": 29,
+        "quality / lint": 16,
+        "quality / test (ubuntu-latest)": 18,
+        "quality / typecheck": 19,
+        "quality / test (windows-latest)": 40,
+        "security / secrets (gitleaks)": 5,
+        "security / sast (semgrep)": 17,
+        "security / sca (trivy)": 12,
+        "CI passed": 2
+      }
+    },
+    {
+      "enable_cache": false,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37592232720",
+      "conclusion": "success",
+      "wall_seconds": 53,
+      "job_seconds_total": 211,
+      "jobs_seconds": {
+        "container / build + image scan + smoke test": 40,
+        "quality / test (ubuntu-latest)": 28,
+        "quality / test (windows-latest)": 41,
+        "security / secrets (gitleaks)": 13,
+        "quality / typecheck": 29,
+        "quality / lint": 18,
+        "security / sast (semgrep)": 21,
+        "security / sca (trivy)": 18,
+        "CI passed": 3
+      }
+    },
+    {
+      "enable_cache": true,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37592354084",
+      "conclusion": "success",
+      "wall_seconds": 50,
+      "job_seconds_total": 184,
+      "jobs_seconds": {
+        "container / build + image scan + smoke test": 38,
+        "quality / lint": 16,
+        "security / secrets (gitleaks)": 7,
+        "quality / test (ubuntu-latest)": 22,
+        "quality / test (windows-latest)": 40,
+        "quality / typecheck": 17,
+        "security / sca (trivy)": 23,
+        "security / sast (semgrep)": 19,
+        "CI passed": 2
+      }
+    },
+    {
+      "enable_cache": false,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37592475060",
+      "conclusion": "success",
+      "wall_seconds": 55,
+      "job_seconds_total": 202,
+      "jobs_seconds": {
+        "security / sca (trivy)": 18,
+        "security / sast (semgrep)": 19,
+        "security / secrets (gitleaks)": 9,
+        "quality / test (ubuntu-latest)": 20,
+        "quality / lint": 25,
+        "quality / test (windows-latest)": 41,
+        "quality / typecheck": 22,
+        "container / build + image scan + smoke test": 45,
+        "CI passed": 3
+      }
+    },
+    {
+      "enable_cache": true,
+      "run_url": "https://github.com/RidhanPar/golden-path-demo-service/actions/runs/37592605082",
+      "conclusion": "success",
+      "wall_seconds": 45,
+      "job_seconds_total": 157,
+      "jobs_seconds": {
+        "container / build + image scan + smoke test": 28,
+        "security / sast (semgrep)": 19,
+        "quality / test (windows-latest)": 35,
+        "quality / lint": 15,
+        "quality / test (ubuntu-latest)": 16,
+        "security / secrets (gitleaks)": 8,
+        "quality / typecheck": 20,
+        "security / sca (trivy)": 13,
+        "CI passed": 3
+      }
+    }
+  ],
+  "median_wall_seconds_uncached": 55.0,
+  "median_wall_seconds_cached": 50.0,
+  "median_job_seconds_total_uncached": 202.0,
+  "median_job_seconds_total_cached": 158.0
+}

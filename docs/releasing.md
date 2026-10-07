@@ -47,3 +47,4 @@ like tags, and a fast-forward-only branch keeps an auditable history of every re
 | v1.0.0 | `40120c3` | Phase 2: first release of the template and reusable workflows |
 | v1.1.0 | `b4857ee` | Runtime image without pip (4 HIGH CVEs found by the first real run); lint-hook subprocess fix; template CI |
 | v1.1.1 | `708f909` | Deploy job declares its own token permissions (the deploy failed on its first run with `contents: read` only) |
+| v1.2.0 | `c600990` | Semgrep installed from its pinned PyPI release with a uv cache instead of pulling its image: job 35 s to 19 s, CI wall-clock 61 s to 50 s (cached) |

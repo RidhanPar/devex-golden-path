@@ -34,8 +34,13 @@ not to suppress the findings.
 
 ### Supply chain of the pipeline itself
 
-- Third-party actions are pinned to **commit SHAs**, and scanner containers to **digests**.
-  A tag can be re-pointed by whoever controls it; a SHA can't.
+- Third-party actions are pinned to **commit SHAs**, and the Trivy and gitleaks containers to
+  **digests**. A tag can be re-pointed by whoever controls it; a SHA can't.
+- Semgrep is the deliberate exception: it is installed from its **pinned PyPI version** with
+  dependencies frozen to a resolution date, because pulling its container image took 19 of
+  the job's ~22 seconds (v1.2.0, measured in `docs/dx-measurements.md`). That's slightly weaker
+  pinning (a version plus PyPI's immutable release files, not a digest) in exchange for
+  the job dropping from 35 s to 19 s.
 - Deploys use **OIDC** (short-lived tokens). No long-lived cloud keys are stored anywhere.
 - One required check (`CI passed`) aggregates every gate, so adding a gate never needs a
   branch-protection change in every repository.

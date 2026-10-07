@@ -334,6 +334,43 @@ def write_report() -> Path:
         "Raw samples, with run links: [`results/dx-cache.json`](../results/dx-cache.json).",
         "",
     ]
+    before_path = res / "dx-cache-v1.1.1.json"
+    if before_path.exists():
+        before = json.loads(before_path.read_text(encoding="utf-8"))
+
+        def job_median(data: dict[str, Any], job: str, enable: bool) -> str:
+            vals = [
+                x["jobs_seconds"][job]
+                for x in data["samples"]
+                if x["enable_cache"] is enable and job in x["jobs_seconds"]
+            ]
+            return f"{statistics.median(vals):.0f}" if vals else "n/a"
+
+        sast = "security / sast (semgrep)"
+        lines += [
+            "## Before and after: Semgrep from PyPI instead of its container image",
+            "",
+            "The first caching run showed Semgrep had become the slowest job; its step timings "
+            "showed the image pull took 19 of ~22 seconds while the scan took ~1.5. v1.2.0 "
+            "installs Semgrep with `uvx` at a pinned version, with a cache. Same experiment, "
+            "same repository: [before](../results/dx-cache-v1.1.1.json) "
+            f"({before['started']}) vs after ({cache['started']}).",
+            "",
+            "| Median | v1.1.1 off | v1.1.1 on | v1.2.0 off | v1.2.0 on |",
+            "|---|---|---|---|---|",
+            f"| `{sast}` job | {job_median(before, sast, False)} s "
+            f"| {job_median(before, sast, True)} s | {job_median(cache, sast, False)} s "
+            f"| {job_median(cache, sast, True)} s |",
+            f"| Total runner time | {before['median_job_seconds_total_uncached']:.0f} s "
+            f"| {before['median_job_seconds_total_cached']:.0f} s "
+            f"| {cache['median_job_seconds_total_uncached']:.0f} s "
+            f"| {cache['median_job_seconds_total_cached']:.0f} s |",
+            f"| Wall-clock | {before['median_wall_seconds_uncached']:.0f} s "
+            f"| {before['median_wall_seconds_cached']:.0f} s "
+            f"| {cache['median_wall_seconds_uncached']:.0f} s "
+            f"| {cache['median_wall_seconds_cached']:.0f} s |",
+            "",
+        ]
     out = ROOT / "docs" / "dx-measurements.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     return out

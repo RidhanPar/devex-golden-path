@@ -121,11 +121,22 @@ All from 2026-10-06/07, on GitHub-hosted runners. Raw data is in [`results/`](re
 | Start to first CI result (machine time) | 146.8 s (green) | 26.6 s (green) |
 | of which CI wall-clock | 121 s | 15 s |
 
-**Caching** (3 uncached/cached pairs after a warm-up, medians): total runner time **208 s →
-181 s (−13%)**. The biggest wins were the container build (43 → 30 s), Windows tests (50 → 37 s)
-and the type check (24 → 15 s). **Wall-clock barely moved (63 s → 61 s)**: jobs run in parallel,
-and the critical path is now Semgrep, which pulls its image every run and has nothing to
-cache. That's the next speed-up to make, and the measurement is what pointed to it.
+**CI speed: measure, fix, re-measure** (3 uncached/cached pairs after a warm-up, medians,
+[docs/dx-measurements.md](docs/dx-measurements.md)):
+
+| | v1.1.1, no cache | v1.1.1, cached | v1.2.0, cached |
+|---|---|---|---|
+| Total runner time | 208 s | 181 s | **158 s (−24%)** |
+| Wall-clock | 63 s | 61 s | **50 s (−21%)** |
+| Semgrep job | 30 s | 35 s | **19 s** |
+
+1. Caching alone (v1.1.1) cut runner time 13%, but **wall-clock barely moved**. Jobs run in
+   parallel, and Semgrep had become the critical path.
+2. Step timings showed **19 of Semgrep's ~22 seconds were pulling its container image**; the
+   scan itself took ~1.5 s.
+3. v1.2.0 installs Semgrep from its pinned PyPI release with a uv cache. Re-running the same
+   experiment: the Semgrep job went 35 → 19 s and wall-clock 61 → 50 s. The critical path is now
+   the Windows test job (~40 s), the next candidate.
 
 **Gate proof:** 4 of 4 deliberate breakages blocked by the expected gates; the control PR
 passed. The first proof run also caught a flaw in the setup: dependency review fails on every
@@ -166,6 +177,8 @@ times are a lower bound. Definitions and limits: [docs/dora-metrics.md](docs/dor
    *branch*, and template versions are immutable tags ([docs/releasing.md](docs/releasing.md)).
 4. **New repositories don't have the dependency graph on**, so dependency review blocked
    every PR. The control PR exposed it, and the setup script now fixes it.
+5. **Caching didn't make CI faster to wait for**, because the slowest parallel job (Semgrep)
+   was spending its time pulling an image. Installing it from PyPI cut wall-clock by 18%.
 
 ## Honest limitations
 
@@ -176,8 +189,9 @@ times are a lower bound. Definitions and limits: [docs/dora-metrics.md](docs/dor
   counts hand-written lines; it can't time a person writing them. On machine time alone the
   golden path is *slower* (147 s vs 27 s) because it runs 9 gates instead of 2. The win is
   what you don't have to write or maintain, and what gets caught.
-- **Single samples.** Time-to-green was measured once per path; CI timings vary by runner
-  load. Rerun the scripts for more samples.
+- **Small samples.** Time-to-green was measured once per path, and each caching arm 3 times.
+  CI timings vary with runner load (one cached run took 84 s against a median of 50 s). Rerun
+  the scripts for more samples.
 - **Deploy target is not a real cloud.** The deploy pushes an image to GHCR and proves the
   OIDC token. The Cloud Run step is documented but **not applied**
   ([docs/deploy-oidc.md](docs/deploy-oidc.md)).
