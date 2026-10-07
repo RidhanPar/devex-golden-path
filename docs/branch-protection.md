@@ -10,6 +10,10 @@ python scripts/apply_branch_protection.py OWNER/REPO --approvals 0 # single-main
 python scripts/apply_branch_protection.py OWNER/REPO --dry-run     # print the JSON only
 ```
 
+The script also enables Dependabot vulnerability alerts, which turns on the repository's
+dependency graph. Without it the `dependency-review` gate fails on every pull request: the
+first gate-proof run found exactly that, when even the harmless control PR was blocked.
+
 ## The rules
 
 | Rule | Setting | Why |

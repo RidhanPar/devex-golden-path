@@ -1,9 +1,11 @@
-"""Apply the golden-path branch protection ruleset to a repository's default branch.
+"""Apply the golden-path branch protection ruleset and security settings to a repository.
 
 Usage:
     python scripts/apply_branch_protection.py OWNER/REPO [--approvals N] [--dry-run]
 
-Idempotent: creates the "golden-path-main" ruleset, or updates it if it already exists.
+Idempotent: enables Dependabot vulnerability alerts (which turns on the dependency graph that
+the dependency-review gate needs), then creates the "golden-path-main" ruleset, or updates it
+if it already exists.
 Needs the GitHub CLI (`gh`) authenticated as a repository admin. Standard library only.
 """
 
@@ -86,6 +88,10 @@ def main() -> None:
     if args.dry_run:
         print(json.dumps(ruleset, indent=2))
         return
+
+    # Without the dependency graph, the dependency-review gate fails on every PR.
+    gh("-X", "PUT", f"repos/{args.repo}/vulnerability-alerts")
+    print(f"Enabled Dependabot alerts and the dependency graph on {args.repo}")
 
     existing = json.loads(gh(f"repos/{args.repo}/rulesets"))
     match = next((r for r in existing if r["name"] == RULESET_NAME), None)
