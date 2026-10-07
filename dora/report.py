@@ -277,6 +277,10 @@ that was never reverted with a recognisable commit message is invisible, so the 
 can only be higher.</li>
 <li>Lead time starts at the commit's committer date, not when work began. For the first
 deployment ever recorded only its head commit is counted.</li>
+<li>Two repositories are themselves part of this project: <code>devex-golden-path</code>
+(this dashboard's Pages deployments) and <code>golden-path-demo-service</code> (a demo service whose
+deployments were driven while building it, including one real failed deploy). Throwaway
+measurement repositories (<code>dx-measure-*</code>) are excluded.</li>
 <li>Supplementary columns are context, not DORA metrics: merged PRs and their open-to-merge
 time, and the share of completed default-branch workflow runs that failed.</li>
 </ul>

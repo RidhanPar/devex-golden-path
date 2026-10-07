@@ -1,0 +1,976 @@
+{
+  "owner": "RidhanPar",
+  "generated_at": "2026-10-07 06:55",
+  "window_start": "2026-07-09T06:55:36.695022+00:00",
+  "window_end": "2026-10-07T06:55:36.695022+00:00",
+  "window_days": 90,
+  "env_pattern": "(?i)^(prod|production|github-pages)$|^main - ",
+  "exclude": "^dx-measure-",
+  "summary": {
+    "repos_total": 35,
+    "repos_with_deploy_data": 9,
+    "repos_with_deploys_in_window": 3,
+    "successful_deploys": 13,
+    "deploy_attempts": 14,
+    "deploys_per_week": 1.012,
+    "median_lead_time_hours": 0.003889,
+    "lead_time_samples": 13,
+    "change_failure_rate": 0.07142857142857142,
+    "failures": 1,
+    "median_restore_hours": 0.136944,
+    "restore_samples": 1,
+    "unrestored_failures": 0,
+    "repos_by_source": {
+      "none": 26,
+      "deployments": 7,
+      "releases": 2
+    }
+  },
+  "weekly": [
+    {
+      "week": "2026-07-06",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-07-13",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-07-20",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-07-27",
+      "count": 4,
+      "by_repo": {
+        "ridhan-portfolio": 4
+      }
+    },
+    {
+      "week": "2026-08-03",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-08-10",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-08-17",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-08-24",
+      "count": 1,
+      "by_repo": {
+        "ridhan-portfolio": 1
+      }
+    },
+    {
+      "week": "2026-08-31",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-09-07",
+      "count": 1,
+      "by_repo": {
+        "ridhan-portfolio": 1
+      }
+    },
+    {
+      "week": "2026-09-14",
+      "count": 2,
+      "by_repo": {
+        "ridhan-portfolio": 2
+      }
+    },
+    {
+      "week": "2026-09-21",
+      "count": 0,
+      "by_repo": {}
+    },
+    {
+      "week": "2026-09-28",
+      "count": 1,
+      "by_repo": {
+        "ridhan-portfolio": 1
+      }
+    },
+    {
+      "week": "2026-10-05",
+      "count": 4,
+      "by_repo": {
+        "devex-golden-path": 2,
+        "golden-path-demo-service": 1,
+        "ridhan-portfolio": 1
+      }
+    }
+  ],
+  "repos": [
+    {
+      "repo": "RidhanPar/ai-automation-command-center",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/ai-ops-workflow-automation-platform",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/api-data-discovery-mcp",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 4,
+        "median_pr_cycle_hours": 0.14708333333333334,
+        "ci_runs": 5,
+        "ci_failure_rate": 0.2,
+        "median_ci_recovery_hours": 23.20611111111111
+      }
+    },
+    {
+      "repo": "RidhanPar/aws-iceberg-lakehouse",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/baltic-commerce-intelligence",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/book-social-network",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 4,
+        "ci_failure_rate": 1.0,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/clickhouse-payments-analytics",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/credit-risk-scorecard-engine",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/crew-rostering-optimisation",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 5,
+        "median_pr_cycle_hours": 1.181111111111111,
+        "ci_runs": 4,
+        "ci_failure_rate": 0.25,
+        "median_ci_recovery_hours": 0.3347222222222222
+      }
+    },
+    {
+      "repo": "RidhanPar/customer-support-intelligence-platform",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/DataAnalysisProjects",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/databricks-credit-risk-features",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/devex-golden-path",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 2,
+        "successes": 2,
+        "deploys_per_week": 0.156,
+        "lead_time_hours": [
+          0.025556,
+          0.033889
+        ],
+        "median_lead_time_hours": 0.029722222222222226,
+        "failures": 0,
+        "change_failure_rate": 0.0,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 10,
+        "ci_failure_rate": 0.1,
+        "median_ci_recovery_hours": 0.10222222222222223
+      }
+    },
+    {
+      "repo": "RidhanPar/directdebit-iq",
+      "metrics": {
+        "source": "releases",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/E-Commerce-Store",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/edupulse-platform",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/employee-management-system-ui",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/fabric-credit-reporting-migration",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 7,
+        "median_pr_cycle_hours": 0.7955555555555556,
+        "ci_runs": 5,
+        "ci_failure_rate": 0.0,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/fraud-mlops-platform",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 4,
+        "ci_failure_rate": 0.25,
+        "median_ci_recovery_hours": 0.07444444444444444
+      }
+    },
+    {
+      "repo": "RidhanPar/golden-path-demo-service",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 2,
+        "successes": 1,
+        "deploys_per_week": 0.078,
+        "lead_time_hours": [
+          0.028056
+        ],
+        "median_lead_time_hours": 0.028055555555555556,
+        "failures": 1,
+        "change_failure_rate": 0.5,
+        "restore_hours": [
+          0.136944
+        ],
+        "median_restore_hours": 0.13694444444444445,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 11,
+        "ci_failure_rate": 0.18181818181818182,
+        "median_ci_recovery_hours": 9.928888888888888
+      }
+    },
+    {
+      "repo": "RidhanPar/hr-people-analytics-platform",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/internal-knowledge-assistant",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 5,
+        "ci_failure_rate": 0.0,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/marketing-ai-automation-platform",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/payguard-ai-fraud-detection",
+      "metrics": {
+        "source": "releases",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/payment-merchant-clv-segmentation",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/payment-retry-ab-test",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/payment-webhook-processor",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/php-ecommerce-store",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 1,
+        "ci_failure_rate": 0.0,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/power-automate-reorder-alert",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/pyspark-aml-transaction-analysis",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/ridhan-portfolio",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 10,
+        "successes": 10,
+        "deploys_per_week": 0.778,
+        "lead_time_hours": [
+          0.003611,
+          0.003889,
+          0.003056,
+          0.003333,
+          0.003333,
+          0.003333,
+          0.004722,
+          0.003333,
+          0.003889,
+          0.004444
+        ],
+        "median_lead_time_hours": 0.003472222222222222,
+        "failures": 0,
+        "change_failure_rate": 0.0,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 10,
+        "ci_failure_rate": 0.0,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/RidhanPar",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/RidhanPar.github.io",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/RidhanParvendhanPortfolio.github.io",
+      "metrics": {
+        "source": "deployments",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    },
+    {
+      "repo": "RidhanPar/web-security-log-anomaly-detector",
+      "metrics": {
+        "source": "none",
+        "window_days": 90,
+        "attempts": 0,
+        "successes": 0,
+        "deploys_per_week": 0.0,
+        "lead_time_hours": [],
+        "median_lead_time_hours": null,
+        "failures": 0,
+        "change_failure_rate": null,
+        "restore_hours": [],
+        "median_restore_hours": null,
+        "unrestored_failures": 0
+      },
+      "supplementary": {
+        "merged_prs": 0,
+        "median_pr_cycle_hours": null,
+        "ci_runs": 0,
+        "ci_failure_rate": null,
+        "median_ci_recovery_hours": null
+      }
+    }
+  ],
+  "api_calls": 279
+}

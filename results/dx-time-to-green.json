@@ -1,0 +1,64 @@
+{
+  "experiment": "time-to-green",
+  "started": "2026-10-07T06:38:20Z",
+  "results": [
+    {
+      "kind": "golden",
+      "repo": "RidhanPar/dx-measure-golden-20261007063820",
+      "run_url": "https://github.com/RidhanPar/dx-measure-golden-20261007063820/actions/runs/37582653892",
+      "first_run_conclusion": "success",
+      "local_setup_seconds": 21.0,
+      "ci_wall_seconds": 121,
+      "start_to_first_ci_result_seconds": 146.8,
+      "green": true,
+      "hand_written": {
+        "files": 0,
+        "lines": 0
+      },
+      "gates": [
+        "lint",
+        "typecheck",
+        "tests",
+        "windows tests",
+        "SAST",
+        "dependency scan",
+        "secret scan",
+        "container build + scan",
+        "deploy (OIDC)"
+      ],
+      "jobs_seconds": {
+        "security / sast (semgrep)": 26,
+        "quality / test (windows-latest)": 47,
+        "container / build + image scan + smoke test": 79,
+        "security / secrets (gitleaks)": 7,
+        "quality / typecheck": 25,
+        "security / sca (trivy)": 19,
+        "quality / lint": 22,
+        "quality / test (ubuntu-latest)": 25,
+        "CI passed": 2,
+        "deploy / deploy (production)": 32
+      }
+    },
+    {
+      "kind": "handmade",
+      "repo": "RidhanPar/dx-measure-handmade-20261007064103",
+      "run_url": "https://github.com/RidhanPar/dx-measure-handmade-20261007064103/actions/runs/37582888809",
+      "first_run_conclusion": "success",
+      "local_setup_seconds": 7.1,
+      "ci_wall_seconds": 15,
+      "start_to_first_ci_result_seconds": 26.6,
+      "green": true,
+      "hand_written": {
+        "files": 7,
+        "lines": 40
+      },
+      "gates": [
+        "lint",
+        "tests"
+      ],
+      "jobs_seconds": {
+        "test": 12
+      }
+    }
+  ]
+}

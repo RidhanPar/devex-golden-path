@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import UTC, datetime, timedelta
@@ -51,6 +52,9 @@ def main() -> None:
         "--from-json", type=Path, help="re-render HTML from a saved dora.json (no API calls)"
     )
     parser.add_argument("--days", type=int, default=90, help="window length (default 90)")
+    parser.add_argument(
+        "--exclude", default=None, help="regex of repo names to skip, e.g. '^dx-measure-'"
+    )
     parser.add_argument("--env-pattern", default=DEFAULT_ENV_PATTERN)
     parser.add_argument("--out", type=Path, default=Path("site"), help="output directory")
     args = parser.parse_args()
@@ -67,7 +71,12 @@ def main() -> None:
     start = end - timedelta(days=args.days)
 
     if args.owner:
-        repo_meta = [(r["full_name"], r["default_branch"]) for r in list_repos(gh, args.owner)]
+        skip = re.compile(args.exclude) if args.exclude else None
+        repo_meta = [
+            (r["full_name"], r["default_branch"])
+            for r in list_repos(gh, args.owner)
+            if not (skip and skip.search(r["name"]))
+        ]
         owner = args.owner
     else:
         repo_meta = []
@@ -103,6 +112,7 @@ def main() -> None:
         "window_end": end.isoformat(),
         "window_days": args.days,
         "env_pattern": args.env_pattern,
+        "exclude": args.exclude,
         "summary": summarize(rows),
         "weekly": weekly(all_deploys, start, end),
         "repos": rows,

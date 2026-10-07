@@ -7,11 +7,12 @@ does:
 ```bash
 python -m dora --owner RidhanPar --days 90 --out site      # all public, non-fork repos
 python -m dora --repos OWNER/a OWNER/b --days 30           # explicit list
-python -m dora --from-json results/dora-2026-10-06.json --out site   # re-render, no API calls
+python -m dora --from-json results/dora-2026-10-07.json --out site   # re-render, no API calls
+python -m dora --owner RidhanPar --exclude '^dx-measure-'  # skip throwaway experiment repos
 ```
 
-It uses `GITHUB_TOKEN`/`GH_TOKEN`, or the GitHub CLI's login. A run over 35 repositories made
-274 API calls. The live dashboard is rebuilt weekly by `.github/workflows/dora-dashboard.yml`
+It uses `GITHUB_TOKEN`/`GH_TOKEN`, or the GitHub CLI's login. A run over 35 repositories makes
+about 300 API calls. The live dashboard is rebuilt weekly by `.github/workflows/dora-dashboard.yml`
 and published to GitHub Pages.
 
 ## Where "a deployment" comes from
@@ -47,8 +48,8 @@ rate and red-to-green recovery time.
 
 ## Limits
 
-- **Small samples.** These are personal portfolio repositories. On 2026-10-06, 7 of 35
-  repositories had any deployment data and 1 deployed in the 90-day window. Medians over a
+- **Small samples.** These are personal portfolio repositories. On 2026-10-07, 9 of 35
+  repositories had any deployment data and 3 deployed in the 90-day window. Medians over a
   handful of events are unstable, and one active repository dominates the pooled numbers.
 - **Hosting changes what "deploy" means.** Vercel, GitHub Pages and Railway deploy every push
   to `main`, which raises frequency and shortens lead time compared with a service that

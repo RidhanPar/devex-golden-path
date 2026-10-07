@@ -1,0 +1,16 @@
+{
+  "experiment": "template-size",
+  "started": "2026-10-07T06:42:10Z",
+  "generated_service": {
+    "files": 25,
+    "lines": 644
+  },
+  "shared_workflows": {
+    "files": 4,
+    "lines": 509
+  },
+  "baseline_handmade": {
+    "files": 7,
+    "lines": 40
+  }
+}
