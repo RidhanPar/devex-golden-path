@@ -52,6 +52,9 @@ class Result:
     failed_checks: list[str] = field(default_factory=list)
     passed_checks: list[str] = field(default_factory=list)
     skipped_checks: list[str] = field(default_factory=list)
+    # Failing checks from other GitHub Apps (e.g. GitGuardian, or code scanning's view of our
+    # SARIF upload). Reported, but not counted as golden-path gates.
+    other_app_failures: list[str] = field(default_factory=list)
     merge_blocked: bool | None = None
     verdict: str = "pending"
 
@@ -193,7 +196,7 @@ def open_pr(repo_dir: Path, slug: str, scenario: Scenario, stamp: str) -> Result
 def check_runs(slug: str, sha: str) -> list[dict[str, str]]:
     out = run(
         "gh", "api", "--paginate", f"repos/{slug}/commits/{sha}/check-runs?per_page=100",
-        "--jq", ".check_runs[] | {name, status, conclusion}",
+        "--jq", ".check_runs[] | {name, status, conclusion, app: .app.slug}",
     )  # fmt: skip
     return [json.loads(line) for line in out.splitlines() if line]
 
@@ -206,6 +209,10 @@ def wait_for_ci(slug: str, result: Result, timeout_s: int) -> None:
         if aggregate and aggregate[0]["status"] == "completed":
             for r in sorted(runs, key=lambda r: r["name"]):
                 if r["name"] == AGGREGATE_CHECK:
+                    continue
+                if r["app"] != "github-actions":
+                    if r["conclusion"] == "failure":
+                        result.other_app_failures.append(f"{r['name']} ({r['app']})")
                     continue
                 bucket = {
                     "failure": result.failed_checks,
@@ -249,21 +256,28 @@ def write_reports(slug: str, results: list[Result], started: str) -> None:
         "Raw data: [`results/gate-proof.json`](../results/gate-proof.json).",
         "Each row is a real pull request; follow the link to see the checks on GitHub.",
         "",
-        "| Breakage | PR | Checks that failed | Merge blocked | Verdict |",
-        "|---|---|---|---|---|",
+        "| Breakage | PR | Golden-path gates that failed | Merge blocked | Verdict "
+        "| Also flagged by other apps |",
+        "|---|---|---|---|---|---|",
     ]
     for r in results:
         failed = "<br>".join(f"`{c}`" for c in r.failed_checks) or "none"
+        others = "<br>".join(r.other_app_failures) or "none"
         blocked = {True: "yes", False: "no", None: "n/a"}[r.merge_blocked]
         number = r.pr_url.rsplit("/", 1)[-1]
         lines.append(
             f"| **{r.scenario}**: {r.description} | [#{number}]({r.pr_url}) | {failed} "
-            f"| {blocked} | {r.verdict} |"
+            f"| {blocked} | {r.verdict} | {others} |"
         )
     lines += [
         "",
         "Merge blocked = GitHub reported the PR as not mergeable because the required check",
         f"`{AGGREGATE_CHECK}` failed (see docs/branch-protection.md).",
+        "",
+        "Golden-path gates are check runs from GitHub Actions jobs in the shared workflows. "
+        "Other apps are listed separately and never counted: `github-code-scanning` is GitHub's "
+        "view of the SARIF our Semgrep job uploads, and anything else is a GitHub App installed "
+        "on the account (e.g. GitGuardian), not part of the golden path.",
         "",
     ]
     (ROOT / "docs" / "gate-proof.md").write_text("\n".join(lines))
