@@ -5,15 +5,17 @@
 #   dependency-review GitHub dependency review (PRs only)          new vulnerable deps in a PR
 #   secrets           gitleaks over the commits being added        leaked credentials
 #
-# Every gate blocks (non-zero exit). Scanners run as digest-pinned containers so a
-# compromised tag upstream cannot change what runs here.
+# Every gate blocks (non-zero exit). Trivy and gitleaks run as digest-pinned containers so a
+# compromised tag upstream cannot change what runs here. Semgrep runs from its pinned PyPI
+# release instead: pulling its container image took 19 of the job's ~22 seconds, while the
+# cached package installs in about 2 (see docs/dx-measurements.md).
 name: reusable-security
 
 on:
   workflow_call:
     inputs:
       enable-cache:
-        description: Cache the Trivy vulnerability database between runs
+        description: Cache the Semgrep package and the Trivy vulnerability database between runs
         type: boolean
         default: true
       source-artifact:
@@ -33,7 +35,10 @@ defaults:
     shell: bash
 
 env:
-  SEMGREP_IMAGE: semgrep/semgrep:1.179.0@sha256:93963d9295a366f59e4850127b1550400ee7b388f04fe144e4a1f6325d96e01b
+  SEMGREP_VERSION: "1.179.0"
+  # Dependencies resolve as they were on this date, so the install is reproducible without a
+  # lock file. Bump together with SEMGREP_VERSION.
+  SEMGREP_RESOLVED_AT: "2026-10-03"
   TRIVY_IMAGE: aquasec/trivy:0.75.0@sha256:af6acf9a6b85dfe389a1941505c0ce9efef52a4719635e1a962f022a3d855daa
   GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
 
@@ -58,9 +63,23 @@ jobs:
         with:
           name: ${{ inputs.source-artifact }}
 
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: false # cached explicitly below, keyed on the Semgrep version
+      - name: Restore Semgrep package cache
+        if: inputs.enable-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/uv-cache
+          key: semgrep-${{ env.SEMGREP_VERSION }}-${{ env.SEMGREP_RESOLVED_AT }}-${{ runner.os }}
+
       - name: Semgrep scan
+        env:
+          UV_CACHE_DIR: ${{ runner.temp }}/uv-cache
         run: |
-          docker run --rm -v "$PWD:/src" -w /src "$SEMGREP_IMAGE" \
+          # python 3.12 ships with the runner image, so uv downloads no interpreter.
+          uvx --python 3.12 --exclude-newer "$SEMGREP_RESOLVED_AT" \
+            --from "semgrep==$SEMGREP_VERSION" \
             semgrep scan --config p/python --config p/dockerfile \
             --metrics=off --error --sarif-output=semgrep.sarif --text
       - name: Upload SARIF to code scanning
